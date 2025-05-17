@@ -14,4 +14,9 @@ class ProductPropertyValue extends Model
     protected $fillable = ['value'];
 
     protected $dateFormat = 'Y-m-d H:i:s';
+
+    protected function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

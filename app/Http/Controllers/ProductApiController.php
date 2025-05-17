@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Services\ProductService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductApiController extends Controller
 {
@@ -12,25 +15,31 @@ class ProductApiController extends Controller
      */
     public function index()
     {
-        $filters = request('properties');
+        $filters = request()->query();
 
-        if (!$filters) {}
+        $service = new ProductService();
+        if (array_key_exists('properties', $filters)) {
+            $products = $service->filter('properties', $filters);
+        } else {
+            $products = $service->filter(null, $filters);
+        };
 
-        $properties = array_map(fn($prop) => str_replace('_', ' ', $prop), array_keys($filters));
-        $values = array_map(fn($prop) => str_replace('_', ' ', $prop), array_values($filters));
-        //dd($properties);
+        $currentPage = request()->input('page', 1);
 
-        $products = Product::whereHas('propertyValues', function ($query) use ($properties, $values) {
-            $query->whereIn('value', $values)
-                ->whereHas('property', function ($subQuery) use ($properties) {
-                    $subQuery->whereIn('name', $properties);
-                });
-        })
-            ->get();
+        // Количество записей на странице
+        $perPage = 40;
 
-        return response()->json($products);
+        // Получаем нужную страницу
+        $paginatedProducts = $products->forPage($currentPage, $perPage);
 
-        //dd(request(['properties']));
+        // Создаем объект пагинации
+        return new LengthAwarePaginator(
+            $paginatedProducts,
+            $products->count(), // Всего записей
+            $perPage, // Сколько записей на странице
+            $currentPage, // Текущая страница
+            ['path' => request()->url()] // Путь к текущему маршруту
+        );
     }
 
     /**

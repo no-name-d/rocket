@@ -19,4 +19,9 @@ class Product extends Model
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
+    protected function productPropertyValues()
+    {
+        return $this->hasMany(ProductPropertyValue::class);
+    }
+
 }
