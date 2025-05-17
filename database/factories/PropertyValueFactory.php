@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
+use App\Models\Property;
+use App\Models\PropertyValue;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PropertyValueFactory extends Factory
 {
+    protected $model = PropertyValue::class;
     /**
      * Define the model's default state.
      *
@@ -17,7 +21,7 @@ class PropertyValueFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+
         ];
     }
 }

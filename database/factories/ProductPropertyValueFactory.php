@@ -2,16 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Product;
-use App\Models\Property;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Property>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProductPropertyValue>
  */
-class PropertyFactory extends Factory
+class ProductPropertyValueFactory extends Factory
 {
-    protected $model = Property::class;
     /**
      * Define the model's default state.
      *
@@ -20,7 +17,7 @@ class PropertyFactory extends Factory
     public function definition(): array
     {
         return [
-                'name' => $this->faker->sentence(1)
+            //
         ];
     }
 }

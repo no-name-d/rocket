@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProductApiController extends Controller
@@ -11,7 +12,25 @@ class ProductApiController extends Controller
      */
     public function index()
     {
-        //
+        $filters = request('properties');
+
+        if (!$filters) {}
+
+        $properties = array_map(fn($prop) => str_replace('_', ' ', $prop), array_keys($filters));
+        $values = array_map(fn($prop) => str_replace('_', ' ', $prop), array_values($filters));
+        //dd($properties);
+
+        $products = Product::whereHas('propertyValues', function ($query) use ($properties, $values) {
+            $query->whereIn('value', $values)
+                ->whereHas('property', function ($subQuery) use ($properties) {
+                    $subQuery->whereIn('name', $properties);
+                });
+        })
+            ->get();
+
+        return response()->json($products);
+
+        //dd(request(['properties']));
     }
 
     /**
