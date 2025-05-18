@@ -7,15 +7,17 @@ use App\Models\ProductPropertyValue;
 use App\Models\Property;
 use App\Models\PropertyValue;
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class FakeCreateCommand extends Command
+class MockProductCommand extends Command
 {
+    use RefreshDatabase;
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:fake-create-command';
+    protected $signature = 'generate:remigrate-and-create-mock-product';
 
     /**
      * The console command description.
@@ -26,16 +28,13 @@ class FakeCreateCommand extends Command
 
     /**
      * Execute the console command.
+     * This command create fake products, properties and propvalues for test
+     * If we have no-mock products, this operation is UNSAFE, because FRESH migration.
      */
     public function handle()
     {
-        /*
-         * This command create fake products, properties and propvalues
-         *
-         *
-         *
-         */
-
+        // clear all data
+        $this->call('migrate:fresh');
         // create fake props
         $fakeProperties = Property::factory()->count(7)->sequence(
             ['name' => 'Цвет'],
@@ -74,6 +73,7 @@ class FakeCreateCommand extends Command
             ['property_id' => $fakeProperties[6]->id, 'value' => '1.6м']
         )->create();
 
+        // Create products property values
         for ($i = 0; $i < 200; $i++) {
             ProductPropertyValue::factory()->create([
                 'product_id' => $products->random()->id,

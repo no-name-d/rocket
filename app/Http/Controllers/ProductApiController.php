@@ -2,43 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Services\ProductService;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+/*
+ * This is API controller (without UI-using) for Product
+ */
 class ProductApiController extends Controller
 {
+    const int PER_PAGE = 40;
+
+    protected $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        // We get products collection by filters
         $filters = request()->query();
 
-        $service = new ProductService();
         if (array_key_exists('properties', $filters)) {
-            $products = $service->filter('properties', $filters);
+            $products = $this->productService->filter('properties', $filters);
         } else {
-            $products = $service->filter(null, $filters);
+            $products = $this->productService->filter(null, $filters);
         };
 
+        // get number of required page from GET key
         $currentPage = request()->input('page', 1);
 
-        // Количество записей на странице
-        $perPage = 40;
+        // Number of entries per page
+        $perPage = self::PER_PAGE;
 
-        // Получаем нужную страницу
+        // Getting the required page
         $paginatedProducts = $products->forPage($currentPage, $perPage);
 
-        // Создаем объект пагинации
+        // Create pagination object
         return new LengthAwarePaginator(
             $paginatedProducts,
-            $products->count(), // Всего записей
-            $perPage, // Сколько записей на странице
-            $currentPage, // Текущая страница
-            ['path' => request()->url()] // Путь к текущему маршруту
+            $products->count(), // All count
+            $perPage,
+            $currentPage,
+            ['path' => request()->url()] // Path to current url
         );
     }
 

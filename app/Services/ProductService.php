@@ -8,6 +8,10 @@ use Illuminate\Support\Arr;
 
 class ProductService
 {
+
+    // This method handles filtering products based on given GET-parameters.
+    // It takes a filter key (e.g., 'properties') and the entire request array.
+    // Depending on the filter type, it calls either 'getByProperties' or returns all products.
     public function filter(?String $key, array $request) : Collection
     {
         return match ($key) {
@@ -16,29 +20,39 @@ class ProductService
         };
     }
 
-    private function getByProperties($properties, ?Collection $products = null, $lvl = 0) : Collection
+    //
+
+    /**
+     * Recursive function for filtering products by their properties.
+     * We divide the array of properties by elements, substituting the property and the array into an ORM-generated
+     * SQL query, then save the result and recursively call the same function, making a filter by the id of the previously
+     * obtained products, until we go through all the parameters.
+     * After that, we return the non-repeating collection of products.
+     * @param $properties
+     * @param Collection|null $products
+     * @return Collection
+     */
+    private function getByProperties($properties, ?Collection $products = null) : Collection
     {
-        //dd($properties);
-        //$firstKey = array_keys($properties)[0];
-
-
+        // Take the first property-value pair from the input array.
         $currentProperty = array_slice($properties, 0, 1);
 
+        // Extract remaining properties for further recursive processing.
         $otherProperties = array_slice($properties, 1);
 
+        // Flatten values associated with the current property.
         $values = Arr::flatten(array_values($currentProperty));
 
-
-        //dd($values);
-
+        // Get the name of the current property.
         $property = array_keys($currentProperty)[0];
 
+        // Prepare IDs of currently filtered products (if any).
         $productsIds = null;
-
         if ($products) {
             $productsIds = array_column($products->toArray(), 'id');
         }
 
+        // Perform the main filtering operation using joins across related tables.
         $filteredProducts = Product::select(['product.id', 'product.name', 'product.price', 'product.quant'])
             ->join('product_property_value', 'product.id', '=', 'product_property_value.product_id')
             ->join('property_value', function ($join) use ($values) {
@@ -53,20 +67,17 @@ class ProductService
             })
             ->get();
 
-        //if ($lvl === 1) {
-        //    dd($filteredProducts);
-        //};
-
-        $lvl++;
-
+        // Recursively continue filtering if there are other properties left.
         if (count($otherProperties) > 0) {
-            $filteredProducts = $this->getByProperties($otherProperties, $filteredProducts, $lvl);
+            $filteredProducts = $this->getByProperties($otherProperties, $filteredProducts);
         }
-        return $filteredProducts->unique('id');
+        // Return unique products to avoid duplicates.
+        return $filteredProducts->unique('id')->sortBy('id')->values();
     }
 
+    // Simple method to retrieve all products.
     private function getAll() : ?Collection
     {
-        return Product::all();
+        return Product::all(['id', 'name', 'price', 'quant'])->sortBy('id');
     }
 }
