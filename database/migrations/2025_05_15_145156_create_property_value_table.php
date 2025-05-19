@@ -20,6 +20,8 @@ return new class extends Migration
                 ->references('id')
                 ->on('property')
                 ->cascadeOnDelete();
+
+            $table->index('property_id');
         });
     }
 

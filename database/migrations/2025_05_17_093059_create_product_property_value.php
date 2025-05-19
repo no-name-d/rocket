@@ -22,6 +22,9 @@ return new class extends Migration
                 ->references('id')
                 ->on('product');
             $table->timestamps();
+
+            $table->index('property_value_id');
+            $table->index('product_id');
         });
     }
 
