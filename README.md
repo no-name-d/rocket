@@ -14,6 +14,8 @@
 ![](./products_api.png)
 
 Для развертывания : 
+```composer install```
+```php artisan serve```
 ```php artisan serve```
 ```php artisan migrate```
 
