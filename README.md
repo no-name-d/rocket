@@ -1,4 +1,4 @@
-Это тестовое задание на создание API backend-а на фреймворке Laravel. В качестве БД используется MySQL.
+Это тестовое задание на создание API backend-а на фреймворке Laravel. В качестве БД используется MySQL 8.0.
 Схема созданного каталога :
 
 
@@ -14,9 +14,9 @@
 ![](./products_api.png)
 
 Для развертывания : \
-  ```composer install```\
-  ```php artisan serve```\
-  ```php artisan migrate```
+  ```composer install``` \
+  ```php artisan migrate``` \
+  ```php artisan serve``` 
 
 Для создания моковых записей : ```php artisan generate:remigrate-and-create-mock-product```
 
