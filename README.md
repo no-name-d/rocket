@@ -13,11 +13,12 @@
 
 ![](./products_api.png)
 
-Для развертывания : 
-```composer install```
-```php artisan serve```
-```php artisan serve```
-```php artisan migrate```
+Для развертывания : \
+  ```composer install```\
+  ```php artisan serve```\
+  ```php artisan migrate```
+
+Для создания моковых записей : ```php artisan generate:remigrate-and-create-mock-product```
 
 Для тестов : 
 ```php artisan test --group=product```.
